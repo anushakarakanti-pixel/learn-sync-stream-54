@@ -1,10 +1,22 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CourseCard from "@/components/CourseCard";
-import { mockCourses } from "@/data/courses";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
 const Index = () => {
+  const [courses, setCourses] = useState<Tables<"courses">[]>([]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const { data } = await supabase.from("courses").select("*");
+      if (data) setCourses(data);
+    };
+    fetchCourses();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -49,8 +61,8 @@ const Index = () => {
           <h2 className="font-display text-2xl font-bold text-foreground">Popular Courses</h2>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {mockCourses.map((course, index) => (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {courses.map((course, index) => (
             <CourseCard key={course.id} course={course} index={index} />
           ))}
         </div>
