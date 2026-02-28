@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { ChevronDown, CheckCircle2, PlayCircle, Lock } from "lucide-react";
+import { ChevronDown, CheckCircle2, PlayCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Section, Video } from "@/data/courses";
+import type { Tables } from "@/integrations/supabase/types";
+
+type Section = Tables<"sections"> & { videos: Tables<"videos">[] };
 
 interface CourseSidebarProps {
   sections: Section[];
   activeVideoId: string;
   completedVideos: Set<string>;
-  onVideoSelect: (video: Video) => void;
+  onVideoSelect: (video: Tables<"videos">) => void;
 }
 
 const CourseSidebar = ({ sections, activeVideoId, completedVideos, onVideoSelect }: CourseSidebarProps) => {
@@ -30,7 +32,6 @@ const CourseSidebar = ({ sections, activeVideoId, completedVideos, onVideoSelect
 
   return (
     <div className="flex h-full flex-col border-l border-sidebar-border bg-sidebar">
-      {/* Header */}
       <div className="border-b border-sidebar-border p-4">
         <h2 className="font-display text-sm font-semibold text-sidebar-foreground">Course Content</h2>
         <div className="mt-2 flex items-center gap-2">
@@ -48,7 +49,6 @@ const CourseSidebar = ({ sections, activeVideoId, completedVideos, onVideoSelect
         </div>
       </div>
 
-      {/* Sections */}
       <div className="flex-1 overflow-y-auto">
         {sections.map((section, sIndex) => {
           const sectionCompleted = section.videos.every((v) => completedVideos.has(v.id));
@@ -61,23 +61,13 @@ const CourseSidebar = ({ sections, activeVideoId, completedVideos, onVideoSelect
                 className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-sidebar-accent"
               >
                 <div className="flex items-center gap-2">
-                  {sectionCompleted && (
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-                  )}
+                  {sectionCompleted && <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />}
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      Section {sIndex + 1}
-                    </p>
-                    <p className="text-sm font-semibold text-sidebar-foreground">
-                      {section.title}
-                    </p>
+                    <p className="text-xs font-medium text-muted-foreground">Section {sIndex + 1}</p>
+                    <p className="text-sm font-semibold text-sidebar-foreground">{section.title}</p>
                   </div>
                 </div>
-                <ChevronDown
-                  className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
-                    isExpanded ? "rotate-180" : ""
-                  }`}
-                />
+                <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
               </button>
 
               <AnimatePresence>
@@ -106,20 +96,12 @@ const CourseSidebar = ({ sections, activeVideoId, completedVideos, onVideoSelect
                           <div className="shrink-0">
                             {isCompleted ? (
                               <CheckCircle2 className="h-4 w-4 text-success" />
-                            ) : isActive ? (
-                              <PlayCircle className="h-4 w-4 text-primary" />
                             ) : (
-                              <PlayCircle className="h-4 w-4 text-muted-foreground" />
+                              <PlayCircle className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p
-                              className={`text-sm truncate ${
-                                isActive
-                                  ? "font-semibold text-primary"
-                                  : "text-sidebar-foreground"
-                              }`}
-                            >
+                            <p className={`text-sm truncate ${isActive ? "font-semibold text-primary" : "text-sidebar-foreground"}`}>
                               {video.title}
                             </p>
                             <p className="text-xs text-muted-foreground">{video.duration}</p>

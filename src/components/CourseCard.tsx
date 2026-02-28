@@ -1,10 +1,10 @@
 import { Star, Users, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import type { Course } from "@/data/courses";
+import type { Tables } from "@/integrations/supabase/types";
 
 interface CourseCardProps {
-  course: Course;
+  course: Tables<"courses">;
   index: number;
 }
 
@@ -17,7 +17,6 @@ const CourseCard = ({ course, index }: CourseCardProps) => {
     >
       <Link to={`/course/${course.id}`} className="group block">
         <div className="overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:shadow-glow hover:-translate-y-1">
-          {/* Thumbnail */}
           <div className="relative aspect-video overflow-hidden bg-muted">
             <div className="gradient-primary absolute inset-0 opacity-80" />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -28,11 +27,10 @@ const CourseCard = ({ course, index }: CourseCardProps) => {
               </div>
             </div>
             <div className="absolute bottom-2 right-2 rounded-md bg-player/80 px-2 py-1 text-xs font-medium text-player-foreground backdrop-blur-sm">
-              {course.totalDuration}
+              {course.total_duration}
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-4">
             <h3 className="mb-1 font-display text-base font-semibold leading-tight text-card-foreground line-clamp-2 group-hover:text-primary transition-colors">
               {course.title}
@@ -46,11 +44,11 @@ const CourseCard = ({ course, index }: CourseCardProps) => {
               </span>
               <span className="flex items-center gap-1">
                 <Users className="h-3.5 w-3.5" />
-                {(course.students / 1000).toFixed(1)}k
+                {((course.students ?? 0) / 1000).toFixed(1)}k
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />
-                {course.totalLessons} lessons
+                {course.total_lessons} lessons
               </span>
             </div>
           </div>
