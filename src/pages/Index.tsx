@@ -30,9 +30,32 @@ const howItWorksSteps = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [courses, setCourses] = useState<Tables<"courses">[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const howItWorksRef = useRef<HTMLDivElement>(null);
+  const coursesRef = useRef<HTMLDivElement>(null);
+
+  const handleStepClick = (action: string) => {
+    if (action === "browse") {
+      coursesRef.current?.scrollIntoView({ behavior: "smooth" });
+    } else if (action === "learn") {
+      if (courses.length > 0) {
+        navigate(`/course/${courses[0].id}`);
+      } else {
+        coursesRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else if (action === "resume") {
+      if (user) {
+        if (courses.length > 0) {
+          navigate(`/course/${courses[0].id}`);
+        }
+      } else {
+        navigate("/auth");
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchCourses = async () => {
