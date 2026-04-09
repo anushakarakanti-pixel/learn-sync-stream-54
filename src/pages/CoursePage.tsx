@@ -242,20 +242,34 @@ const CoursePage = () => {
 
           {/* Video info */}
           <div className="flex-1 overflow-y-auto bg-background p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl">
-              <h2 className="font-display text-xl font-bold text-foreground">{activeVideo?.title}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{course.description}</p>
-              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Lesson {currentIndex + 1} of {allVideos.length}</span>
-                <span>•</span>
-                <span>{activeVideo?.duration}</span>
-                {!user && (
-                  <>
-                    <span>•</span>
-                    <Link to="/auth" className="text-primary hover:underline">Sign in to save progress</Link>
-                  </>
-                )}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl space-y-6">
+              <div>
+                <h2 className="font-display text-xl font-bold text-foreground">{activeVideo?.title}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{course.description}</p>
+                <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Lesson {currentIndex + 1} of {allVideos.length}</span>
+                  <span>•</span>
+                  <span>{activeVideo?.duration}</span>
+                  {!user && (
+                    <>
+                      <span>•</span>
+                      <Link to="/auth" className="text-primary hover:underline">Sign in to save progress</Link>
+                    </>
+                  )}
+                </div>
               </div>
+
+              {/* Certificate Section */}
+              {user && (
+                <CourseCertificate
+                  courseTitle={course.title}
+                  courseId={course.id}
+                  userId={user.id}
+                  userName={user.email?.split("@")[0] ?? "Student"}
+                  totalLessons={allVideos.length}
+                  completedCount={completedVideos.size}
+                />
+              )}
             </motion.div>
           </div>
         </div>
