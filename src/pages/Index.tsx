@@ -13,16 +13,19 @@ const howItWorksSteps = [
     icon: PlayCircle,
     title: "Pick a Course",
     description: "Browse our library and choose from dozens of expert-led courses across development, design, and data science.",
+    action: "browse" as const,
   },
   {
     icon: BarChart3,
     title: "Learn at Your Pace",
     description: "Watch video lessons anytime. Your progress is saved automatically — pause and resume exactly where you left off.",
+    action: "learn" as const,
   },
   {
     icon: RotateCcw,
     title: "Resume Anytime",
     description: "Come back days later and pick up right where you stopped. Your progress syncs across all your devices instantly.",
+    action: "resume" as const,
   },
 ];
 
