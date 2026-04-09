@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TrendingUp, Sparkles, Search, PlayCircle, BarChart3, RotateCcw, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CourseCard from "@/components/CourseCard";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import type { Tables } from "@/integrations/supabase/types";
 
 const howItWorksSteps = [
@@ -11,23 +13,49 @@ const howItWorksSteps = [
     icon: PlayCircle,
     title: "Pick a Course",
     description: "Browse our library and choose from dozens of expert-led courses across development, design, and data science.",
+    action: "browse" as const,
   },
   {
     icon: BarChart3,
     title: "Learn at Your Pace",
     description: "Watch video lessons anytime. Your progress is saved automatically — pause and resume exactly where you left off.",
+    action: "learn" as const,
   },
   {
     icon: RotateCcw,
     title: "Resume Anytime",
     description: "Come back days later and pick up right where you stopped. Your progress syncs across all your devices instantly.",
+    action: "resume" as const,
   },
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [courses, setCourses] = useState<Tables<"courses">[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const howItWorksRef = useRef<HTMLDivElement>(null);
+  const coursesRef = useRef<HTMLDivElement>(null);
+
+  const handleStepClick = (action: string) => {
+    if (action === "browse") {
+      coursesRef.current?.scrollIntoView({ behavior: "smooth" });
+    } else if (action === "learn") {
+      if (courses.length > 0) {
+        navigate(`/course/${courses[0].id}`);
+      } else {
+        coursesRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else if (action === "resume") {
+      if (user) {
+        if (courses.length > 0) {
+          navigate(`/course/${courses[0].id}`);
+        }
+      } else {
+        navigate("/auth");
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -116,7 +144,8 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15 }}
-                className="rounded-xl border border-border bg-card p-6 text-center transition-all hover:shadow-glow hover:-translate-y-1"
+                onClick={() => handleStepClick(step.action)}
+                className="cursor-pointer rounded-xl border border-border bg-card p-6 text-center transition-all hover:shadow-glow hover:-translate-y-1 hover:border-primary/50"
               >
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl gradient-primary">
                   <step.icon className="h-7 w-7 text-primary-foreground" />
@@ -130,7 +159,7 @@ const Index = () => {
       </section>
 
       {/* Course Grid */}
-      <section id="courses" className="container py-12">
+      <section id="courses" ref={coursesRef} className="container py-12">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
