@@ -58,6 +58,20 @@ const VideoPlayer = ({ videoUrl, startTime = 0, onTimeUpdate, onEnded }: VideoPl
     };
   }, [onTimeUpdate]);
 
+  const handleError = useCallback(() => {
+    console.error("Video failed to load:", videoUrl);
+  }, [videoUrl]);
+
+  // Try to play when loaded
+  const handleCanPlay = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Autoplay blocked, user needs to click play
+        console.log("Autoplay blocked, user must click play");
+      });
+    }
+  }, []);
+
   return (
     <div className="relative aspect-video w-full bg-player">
       <video
@@ -65,12 +79,15 @@ const VideoPlayer = ({ videoUrl, startTime = 0, onTimeUpdate, onEnded }: VideoPl
         key={videoUrl}
         src={videoUrl}
         controls
+        playsInline
+        preload="auto"
         className="h-full w-full"
         onLoadedMetadata={handleLoadedMetadata}
+        onCanPlay={handleCanPlay}
         onTimeUpdate={handleTimeUpdate}
         onPause={handlePause}
         onEnded={handleEnded}
-        autoPlay
+        onError={handleError}
       />
     </div>
   );
