@@ -80,7 +80,7 @@ const VideoPlayer = ({ videoUrl, startTime = 0, onTimeUpdate, onEnded }: VideoPl
         src={videoUrl}
         controls
         playsInline
-        crossOrigin="anonymous"
+        preload="auto"
         className="h-full w-full"
         onLoadedMetadata={handleLoadedMetadata}
         onCanPlay={handleCanPlay}
