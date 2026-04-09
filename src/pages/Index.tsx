@@ -159,7 +159,7 @@ const Index = () => {
       </section>
 
       {/* Course Grid */}
-      <section id="courses" className="container py-12">
+      <section id="courses" ref={coursesRef} className="container py-12">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
