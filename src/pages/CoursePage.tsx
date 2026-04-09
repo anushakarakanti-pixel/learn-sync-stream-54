@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import CourseSidebar from "@/components/CourseSidebar";
 import VideoPlayer from "@/components/VideoPlayer";
+import CourseCertificate from "@/components/CourseCertificate";
 import { saveProgress, getProgress, getAllProgress } from "@/lib/progress";
 import type { Tables } from "@/integrations/supabase/types";
 
