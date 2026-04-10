@@ -232,13 +232,10 @@ const CourseCertificate = ({
       </div>
 
       {!certificate ? (
-        <Button
-          onClick={handleGenerateCertificate}
-          disabled={loading}
-          className="w-full gradient-primary text-primary-foreground hover:opacity-90"
-        >
-          {loading ? "Generating..." : "Generate Certificate"}
-        </Button>
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Generating your certificate...
+        </div>
       ) : (
         <div className="space-y-4">
           {/* Certificate preview */}
