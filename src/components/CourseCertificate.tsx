@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Award, Download, CheckCircle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Award, Download, CheckCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -32,38 +32,43 @@ const CourseCertificate = ({
   const isComplete = totalLessons > 0 && completedCount >= totalLessons;
   const progress = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-  const handleGenerateCertificate = async () => {
-    setLoading(true);
-    try {
-      // Check if certificate already exists
-      const { data: existing } = await supabase
-        .from("certificates")
-        .select("certificate_number, issued_at")
-        .eq("user_id", userId)
-        .eq("course_id", courseId)
-        .maybeSingle();
+  // Auto-generate certificate when course is completed
+  useEffect(() => {
+    if (!isComplete || certificate || loading) return;
 
-      if (existing) {
-        setCertificate(existing);
-        toast.success("Certificate loaded!");
-      } else {
-        const { data, error } = await supabase
+    const generateCertificate = async () => {
+      setLoading(true);
+      try {
+        const { data: existing } = await supabase
           .from("certificates")
-          .insert({ user_id: userId, course_id: courseId })
           .select("certificate_number, issued_at")
-          .single();
+          .eq("user_id", userId)
+          .eq("course_id", courseId)
+          .maybeSingle();
 
-        if (error) throw error;
-        setCertificate(data);
-        toast.success("Certificate generated! 🎉");
+        if (existing) {
+          setCertificate(existing);
+        } else {
+          const { data, error } = await supabase
+            .from("certificates")
+            .insert({ user_id: userId, course_id: courseId })
+            .select("certificate_number, issued_at")
+            .single();
+
+          if (error) throw error;
+          setCertificate(data);
+          toast.success("Certificate generated! 🎉");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to generate certificate");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to generate certificate");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    generateCertificate();
+  }, [isComplete, certificate, loading, userId, courseId]);
 
   const handleDownload = () => {
     if (!certRef.current) return;
@@ -227,13 +232,10 @@ const CourseCertificate = ({
       </div>
 
       {!certificate ? (
-        <Button
-          onClick={handleGenerateCertificate}
-          disabled={loading}
-          className="w-full gradient-primary text-primary-foreground hover:opacity-90"
-        >
-          {loading ? "Generating..." : "Generate Certificate"}
-        </Button>
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Generating your certificate...
+        </div>
       ) : (
         <div className="space-y-4">
           {/* Certificate preview */}
